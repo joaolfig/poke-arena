@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Poké Arena</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="game"></canvas>
+<button id="btn-full" class="hidden" title="Tela cheia (para sair, segure Esc)">⛶</button>
+
+<!-- menu -->
+<div id="menu" class="screen">
+  <div class="panel menu-panel">
+    <h1>Poké Arena</h1>
+    <p class="sub">MOBA de uma lane com Pokémon · regras do LoL, golpes do Poké Realm</p>
+    <label>Seu nome <input id="name" maxlength="16" placeholder="Treinador"></label>
+    <button id="btn-solo" class="big">🤖 Jogar contra bots</button>
+    <button id="btn-host" class="big">🏠 Criar sala</button>
+    <div class="row"><input id="code" maxlength="5" placeholder="CÓDIGO"><button id="btn-join">Entrar</button></div>
+    <p id="menu-err" class="err"></p>
+    <details class="help"><summary>Controles</summary>
+      <p><b>Botão direito</b>: andar / atacar · <b>A + clique</b>: ataque-mover · <b>S</b>: parar · parado, seu campeão só ataca quando você clica<br>
+      <b>Q W E R</b>: segure para mirar, solte para lançar · <b>Ctrl + Q/W/E/R</b>: subir habilidade<br>
+      <b>D</b>: Teleporte (Flash) · <b>F</b>: Curar · <b>B</b>: voltar à base · <b>P</b>: loja · <b>Tab</b>: placar · <b>1-6</b>: usar item · <b>N</b>: som · <b>C</b>: alcance<br>
+      <b>Y</b>: travar/destravar a câmera · <b>Espaço</b>: centralizar · <b>arrastar com o botão esquerdo</b>: mover o mapa · <b>roda</b>: zoom</p>
+    </details>
+  </div>
+</div>
+
+<!-- sala -->
+<div id="lobby" class="screen hidden">
+  <div class="panel lobby-panel">
+    <div class="lobby-top">
+      <h2 id="lobby-code"></h2>
+      <label>Tamanho <select id="lobby-size"><option value="1">1 x 1</option><option value="3">3 x 3</option><option value="5">5 x 5</option></select></label>
+    </div>
+    <div class="teams"><div id="team-0" class="team"></div><div id="team-1" class="team"></div></div>
+    <h3>Escolha seu Pokémon</h3>
+    <div id="champ-grid"></div>
+    <p id="lobby-err" class="err"></p>
+    <p id="lobby-wait"></p>
+    <div class="row">
+      <button id="btn-back">Voltar</button>
+      <button id="btn-team">Trocar de time</button>
+      <button id="btn-start" class="big">Começar</button>
+    </div>
+  </div>
+</div>
+
+<!-- HUD da partida -->
+<div id="hud" class="hidden">
+  <div id="topbar"><span id="kills"></span><span id="clock">0:00</span></div>
+  <div id="feed"></div>
+  <canvas id="minimap" width="240" height="240"></canvas>
+  <div id="bottom">
+    <div id="champ-box">
+      <div id="portrait"></div>
+      <div id="lvl">1</div>
+      <div id="xp"><div id="xpbar"></div></div>
+    </div>
+    <div id="center">
+      <div id="champ-line"><b id="champ-name"></b> <span id="passive"></span><div id="buffs"></div></div>
+      <div id="abilities"></div>
+      <div class="bar hp"><div id="hpbar"></div><span id="hptxt"></span></div>
+      <div class="bar mp"><div id="mpbar"></div><span id="mptxt"></span></div>
+    </div>
+    <div id="right-box">
+      <div id="items"></div>
+      <div id="gold"></div>
+      <div id="stats"></div>
+    </div>
+  </div>
+  <div id="recall" class="hidden"><span>Voltando à base</span><div><i id="recall-bar"></i></div></div>
+  <div id="basehint" class="hidden"></div>
+  <div id="death" class="hidden">Renasce em <b id="death-t"></b> s · aproveite para comprar (P)</div>
+  <div id="shop" class="hidden panel">
+    <div class="shop-head"><h2>Loja</h2><span id="shop-gold"></span><button id="shop-close">✕</button></div>
+    <div class="shop-inv-row"><span>Inventário (arraste para escolher a tecla 1-6):</span><div id="shop-inv"></div></div>
+    <div id="shop-rec"></div>
+    <div id="shop-list"></div>
+  </div>
+  <div id="score" class="hidden panel"><table><thead><tr><th>Pokémon</th><th title="Nível">Nv</th><th title="Abates / mortes / assistências">A/M/A</th><th title="Minions abatidos">CS</th><th>Itens</th><th title="Vida máxima">❤</th><th title="Dano de ataque">⚔</th><th title="Poder de habilidade">✦</th><th title="Armadura">🛡</th><th title="Resistência mágica">🔰</th><th title="Velocidade de ataque (ataques por segundo)">⚡</th><th title="Velocidade de movimento">👟</th><th title="Chance de crítico">💥</th><th title="DPS: dano por segundo só com ataque básico (AD × vel. de ataque, com o crítico médio)">🗡</th><th title="Vida efetiva contra dano físico / contra dano mágico: quanto dano de cada tipo aguenta antes de cair">❤ fís/mág</th></tr></thead><tbody id="score-body"></tbody></table><p class="score-hint">Passe o mouse nos títulos para ver o que cada número é. Dourado = o maior da partida.</p></div>
+  <div id="end" class="hidden"><h1 id="end-title"></h1><button id="btn-again" class="big">Voltar ao menu</button></div>
+  <div id="pause" class="hidden"><div><h1>⏸ Pausado</h1><p>Aperte <b>Esc</b> ou clique para continuar</p></div></div>
+  <div id="lost" class="hidden">A conexão com o anfitrião caiu.</div>
+</div>
+
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
+<script type="module" src="src/main.js"></script>
+</body>
+</html>
