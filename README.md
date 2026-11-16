@@ -4,6 +4,10 @@ MOBA de 3 lanes (como o Summoner's Rift) com Pokémon. A matemática e os contro
 
 **Jogar:** rode `jogar.bat` (ou `node server.js`) e abra http://localhost:8081. Sem build e sem dependências. Os módulos ES precisam do servidor, não abrem direto do arquivo.
 
+## Jogar online
+
+Abra **https://joaolfig.github.io/poke-arena/**, crie uma sala e passe o código para os amigos (eles abrem o mesmo link e entram com o código). Não precisa instalar nada.
+
 ## Controles
 
 O seu campeão só ataca quando você manda (botão direito no alvo ou A + clique), como o LoL com o "ataque automático" desligado: parado, ele não bate sozinho, o que deixa você escolher a hora do último golpe.
