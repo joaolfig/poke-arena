@@ -2,8 +2,9 @@
 // (este navegador é o host); "Entrar" só envia comandos e desenha os snapshots que chegam.
 
 import { CHAMPIONS, formAt } from './data/champions.js';
-import { TICK, SNAP_RATE, TEAM_NAME, SIGHT, GAME } from './config.js';
+import { TICK, SNAP_RATE, TEAM_NAME, SIGHT, GAME, MAPS } from './config.js';
 import { Game } from './sim/game.js';
+import { setMap } from './sim/map.js';
 import { newVision, computeVision } from './sim/vision.js';
 import { hostRoom, joinRoom } from './net/peer.js';
 import { View } from './client/view.js';
@@ -59,7 +60,7 @@ for (const ev of ['mousedown', 'mouseup', 'auxclick']) window.addEventListener(e
 window.addEventListener('beforeunload', e => { if (started) { e.preventDefault(); e.returnValue = ''; } });
 
 // ---------- estado da sala ----------
-const lobby = { size: 3, players: [], code: '' };   // players: { pid, name, team, champ }
+const lobby = { size: 3, map: 'rift', players: [], code: '' };   // players: { pid, name, team, champ }; map: chave de MAPS
 let mode = 'solo', net = null, myPid = 'host', started = false, paused = false;
 
 function savedName() { try { return localStorage.getItem(NAME_KEY) || ''; } catch { return ''; } }
@@ -110,7 +111,8 @@ $('btn-join').onclick = async () => {
 function openLobby() {
   show('menu', false); show('lobby');
   $('lobby-code').textContent = mode === 'host' ? `Código da sala: ${lobby.code}` : mode === 'client' ? 'Na sala de outro jogador' : 'Partida contra bots';
-  show('lobby-size', mode !== 'client'); show('btn-start', mode !== 'client');
+  show('lobby-size-l', mode !== 'client'); show('btn-start', mode !== 'client');
+  $('lobby-map').disabled = mode === 'client';   // quem entra vê o mapa, mas só o anfitrião escolhe
   $('lobby-wait').textContent = mode === 'client' ? 'Esperando o anfitrião começar...' : '';
   $('champ-grid').innerHTML = '';
   for (const c of CHAMPIONS) {
@@ -136,6 +138,7 @@ $('btn-team').onclick = () => {
   lobbyChanged();
 };
 $('lobby-size').onchange = () => { lobby.size = +$('lobby-size').value; lobbyChanged(); };
+$('lobby-map').onchange = () => { lobby.map = $('lobby-map').value; lobbyChanged(); };
 $('btn-start').onclick = () => startHost();
 $('btn-back').onclick = () => location.reload();
 
@@ -143,6 +146,8 @@ function lobbyChanged() { paintLobby(); if (mode === 'host') net.broadcast({ t: 
 
 function paintLobby() {
   $('lobby-size').value = lobby.size;
+  $('lobby-map').value = lobby.map;
+  $('lobby-map').title = MAPS[lobby.map].desc;
   const me = lobby.players.find(p => p.pid === myPid);
   for (const t of [0, 1]) {
     const list = lobby.players.filter(p => p.team === t);
@@ -185,7 +190,7 @@ function hostData(id, m) {
 function clientData(m) {
   if (m.t === 'lobby') { Object.assign(lobby, m.lobby); paintLobby(); }
   else if (m.t === 'full') { $('lobby-wait').textContent = 'A partida já começou nessa sala.'; }
-  else if (m.t === 'start') startSession(m.team, m.champ);
+  else if (m.t === 'start') { setMap(m.map || lobby.map); startSession(m.team, m.champ); }
   else if (m.t === 's' && view) view.receive(m);
 }
 
@@ -203,8 +208,9 @@ function startHost() {
     const pool = CHAMPIONS.filter(c => !used.has(c.id)).sort(() => Math.random() - 0.5);
     while (n < lobby.size) { players.push({ pid: null, name: 'Bot', team: t, champ: pool[i % pool.length].id, bot: true }); i++; n++; }
   }
+  setMap(lobby.map);
   game = new Game(players);
-  for (const p of lobby.players) if (p.pid !== 'host') net.send(p.pid, { t: 'start', team: p.team, champ: p.champ });
+  for (const p of lobby.players) if (p.pid !== 'host') net.send(p.pid, { t: 'start', team: p.team, champ: p.champ, map: lobby.map });
   const me = lobby.players.find(p => p.pid === 'host');
   startSession(me.team, me.champ);
   hostLoop();

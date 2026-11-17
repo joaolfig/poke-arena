@@ -30,6 +30,8 @@ input, select { font: inherit; color: var(--text); background: #0f172a; border: 
 .lobby-panel { width: min(980px, 100%); padding: 22px; }
 .lobby-top { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
 .lobby-top h2 { margin: 0; }
+.lobby-opts { display: flex; gap: 12px; flex-wrap: wrap; }
+select:disabled { opacity: 0.75; }
 .teams { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin: 14px 0; }
 .team { background: #0f172a; border-radius: 10px; padding: 8px 14px; }
 .team h3 { margin: 4px 0; } .team ul { margin: 0; padding-left: 18px; line-height: 1.8; }

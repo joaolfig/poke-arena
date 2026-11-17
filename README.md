@@ -1,6 +1,6 @@
 # Poké Arena
 
-MOBA de 3 lanes (como o Summoner's Rift) com Pokémon. A matemática e os controles seguem o LoL. Os golpes, os avisos no chão e o PeerJS vêm do Poké Realm, e os sprites animados do PMDCollab.
+MOBA de Pokémon com dois mapas: 3 lanes (como o Summoner's Rift) ou 1 lane (estilo ARAM). A matemática e os controles seguem o LoL. Os golpes, os avisos no chão e o PeerJS vêm do Poké Realm, e os sprites animados do PMDCollab.
 
 **Jogar:** rode `jogar.bat` (ou `node server.js`) e abra http://localhost:8081. Sem build e sem dependências. Os módulos ES precisam do servidor, não abrem direto do arquivo.
 
@@ -95,6 +95,12 @@ Botas primeiro, depois os itens na ordem. Na loja (P), a faixa **⭐ Recomendado
 | Zoroark | assassino: letalidade e crítico | Choice Scarf → King's Rock → Punching Glove → Scope Lens → Choice Band → Assault Vest |
 
 ## Mapa
+
+O anfitrião escolhe o mapa na sala (quem entra vê qual foi escolhido).
+
+**1 lane:** uma lane só na diagonal, com recuos e moitas dos lados, sem selva. Ouro e XP passivos maiores (como no ARAM), já que todo mundo divide a mesma lane.
+
+**3 lanes:**
 
 - **3 lanes** (cima, meio e baixo), cada uma com torre externa e interna por time. A interna só leva dano depois que a externa cai, e o nexus só depois que alguma interna cai.
 - **Rio** na diagonal, cruzando a lane do meio.

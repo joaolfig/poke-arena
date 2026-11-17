@@ -1,7 +1,7 @@
 // Desenho da partida num canvas 2D: terreno (em pedaços guardados), avisos dos golpes, unidades com
 // sprites animados, projéteis, efeitos, névoa de guerra e minimapa.
 
-import { GRID, BRUSHES, FOUNTAIN, LANES, LANE_NAMES, CAMPS } from '../sim/map.js';
+import { GRID, BRUSHES, FOUNTAIN, LANES, LANE_NAMES, CAMPS, onMapChange } from '../sim/map.js';
 import { MAP, TEAM_COLOR, TOWER, MINION, GAME } from '../config.js';
 import { TYPE_COLORS } from '../data/types.js';
 import { MOVE_STYLE, movePos } from '../data/moves.js';
@@ -11,10 +11,12 @@ import { spriteFrame, drawSprite, ensureSprite } from './sprites.js';
 import { segDist2 } from '../core/math.js';
 import { SHOT_COLORS } from './fx.js';
 
-const { N, C, walk, brush, lane, river } = GRID;
-const BIG_PIDS = new Set(CAMPS.filter(c => c.big).map(c => c.pid));   // chefes do rio: desenhados maiores
-const S = MAP.size;
-const CHUNK = C * 8;
+let N, C, walk, brush, lane, river, BIG_PIDS, S, CHUNK;
+onMapChange(() => {
+  ({ N, C, walk, brush, lane, river } = GRID);
+  BIG_PIDS = new Set(CAMPS.filter(c => c.big).map(c => c.pid));   // chefes do rio: desenhados maiores
+  S = MAP.size; CHUNK = C * 8;
+});
 const BODY = { champ: 150, melee: 80, ranged: 80, siege: 105, monster: 150 };
 
 // campeões crescem a cada evolução: 1º estágio menor, Mega maior

@@ -4,9 +4,10 @@
 // Moita: as células dentro de uma moita só ficam visíveis (1) para quem está na mesma moita; para os
 // outros ficam 2 = "ao alcance, mas escondido" (quem ataca de dentro da moita se revela por um instante).
 
-import { GRID } from './map.js';
+import { GRID, onMapChange } from './map.js';
 
-const { N, C, walk, brush } = GRID;
+let N, C, walk, brush;
+onMapChange(() => ({ N, C, walk, brush } = GRID));
 
 export function newVision() { return new Uint8Array(N * N); }
 

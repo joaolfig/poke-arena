@@ -1,13 +1,14 @@
 // A* no grid de 8 vizinhos (sem cortar quinas) + suavização por linha de visada.
 
-import { GRID, cellOf, clearLine, nearestWalkable } from './map.js';
+import { GRID, cellOf, clearLine, nearestWalkable, onMapChange } from './map.js';
 
-const { N, C, walk } = GRID;
-const g = new Float32Array(N * N), from = new Int32Array(N * N), seen = new Uint32Array(N * N), closed = new Uint32Array(N * N);
-let stamp = 0;
-
-// heap binário de índices de célula, ordenado por f
-const heap = [], fv = new Float32Array(N * N);
+let N, C, walk, g, from, seen, closed, fv, stamp = 0;
+const heap = [];   // heap binário de índices de célula, ordenado por f
+onMapChange(() => {
+  ({ N, C, walk } = GRID);
+  g = new Float32Array(N * N); from = new Int32Array(N * N); seen = new Uint32Array(N * N); closed = new Uint32Array(N * N);
+  fv = new Float32Array(N * N); stamp = 0;
+});
 function push(k) {
   heap.push(k);
   let i = heap.length - 1;

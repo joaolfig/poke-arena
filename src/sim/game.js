@@ -44,7 +44,8 @@ export class Game {
     for (const team of [0, 1]) {
       const list = players.filter(p => p.team === team);
       // funções no mapa (como no LoL): quem joga fica com o meio; os bots dividem o resto
-      const roles = [...(ROLES[list.length] || ROLES[5])];
+      // (no mapa de 1 lane todo mundo fica no meio)
+      const roles = LANES.top ? [...(ROLES[list.length] || ROLES[5])] : list.map(() => 'mid');
       const take = r => { const k = roles.indexOf(r); return roles.splice(k >= 0 ? k : 0, 1)[0] || 'mid'; };
       const roleOf = new Map(list.filter(p => !p.bot).map(p => [p, take('mid')]));
       for (const p of list) if (p.bot) roleOf.set(p, take(roles[0]));

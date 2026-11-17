@@ -6,7 +6,7 @@ export const SNAP_RATE = 30;           // snapshots por segundo para cada time (
 export const INTERP_DELAY = 0.07;      // atraso de interpolação no cliente (s): pouco mais de 2 snapshots
 
 export const MAP = {
-  size: 10800,                         // quadrado de 10800 × 10800: lane do meio ~11000, as dos lados ~16000
+  size: 10800,                         // muda com o mapa escolhido (MAPS abaixo; quem troca é setMap em sim/map.js)
   cell: 60,                            // célula do grid de navegação
 };
 
@@ -29,6 +29,20 @@ export const GAME = {
   bossFirst: 300,                      // primeira aparição dos chefes (5:00)
   bossRespawn: 300,                    // chefes do rio (Kyogre e Groudon)
   shopRadius: 1100,                    // só compra perto da fonte (ou morto)
+};
+
+// mapas que dá para escolher na sala: tamanho do quadrado e o que muda na economia (vai para GAME)
+export const MAPS = {
+  rift: {
+    nome: '3 lanes', desc: 'Top, meio e bot, com selva, acampamentos e chefes no rio',
+    size: 10800,                       // lane do meio ~11000, as dos lados ~16000
+    game: { goldPerSec: 2.04, xpPerSec: 0 },   // como no Summoner's Rift
+  },
+  aram: {
+    nome: '1 lane', desc: 'Uma lane só, sem selva: luta o tempo todo',
+    size: 9000,
+    game: { goldPerSec: 5, xpPerSec: 7 },      // como no ARAM: todos dividem uma lane só
+  },
 };
 
 // XP para passar do nível n para n+1 (curva do LoL: 280, 380, 480...)
